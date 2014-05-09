@@ -5,6 +5,7 @@
 package controlador;
 
 import java.util.ArrayList;
+import javax.swing.JToggleButton;
 import modelo.NumeroAleatorio;
 import modelo.Operadores;
 
@@ -37,13 +38,41 @@ public class NumerosJuego {
         return RESULTADO;
     }
 
+    public void setButtonsNumber(JToggleButton[] buttons) {
+        if (buttons.length == MAX_NUMEROS_USADOS) {
+            
+            int totalNumeros = NUMEROS.size();
+
+            if (totalNumeros < MAX_NUMEROS_USADOS) {
+                
+                int diferencia = MAX_NUMEROS_USADOS - totalNumeros;
+                
+                for (int i = 0; i < totalNumeros; i++) {
+                    if (i == totalNumeros - 1) {
+                        buttons[MAX_NUMEROS_USADOS-1].setText(NUMEROS.get(i) + "");
+                    } else {
+                        buttons[i].setText(NUMEROS.get(i) + "");
+                    }
+                }
+                
+                int continuacion = MAX_NUMEROS_USADOS - diferencia - 1;
+                
+                System.out.println(continuacion);
+                for (; continuacion < totalNumeros-1; continuacion++) {
+                    System.out.println(continuacion);
+                }
+                System.out.println(NUMEROS);
+            }
+        }
+    }
+
     private ArrayList<Integer> getListaNumeros() {
         int usados = NumeroAleatorio.generaNumero(MIN_NUMEROS_USADOS, MAX_NUMEROS_USADOS);
         ArrayList<Integer> numeros = new ArrayList<>();
         for (int i = 0; i < usados; i++) {
             int numero;
             int min = (i == usados - 1) ? 10 : 1;
-            int max = (i == usados - 1) ? 99 : 10;
+            int max = (i == usados - 1) ? 99 : 9;
             numero = NumeroAleatorio.generaNumero(min, max);
             numeros.add(numero);
         }
@@ -71,8 +100,8 @@ public class NumerosJuego {
     private int resultado() {
         int resultado = 0;
         do {
+            boolean banderaPorDecimales = false;
             LISTA_OPERADORES = getListaOperadores();
-            System.out.println("calculo...");
             for (int i = 0; i < NUMEROS.size(); i++) {
                 resultado = NUMEROS.get(i);
                 for (int j = 0; j < LISTA_OPERADORES.size(); j++) {
@@ -87,12 +116,18 @@ public class NumerosJuego {
                             resultado *= NUMEROS.get(j + 1);
                             break;
                         case COCIENTE:
-                            resultado /= NUMEROS.get(j + 1);
+                            if (resultado % NUMEROS.get(j + 1) == 0) {
+                                resultado /= NUMEROS.get(j + 1);
+                            } else {
+                                banderaPorDecimales = true;
+                                j = LISTA_OPERADORES.size() - 1;
+                            }
                             break;
                     }
                 }
                 break;
             }
+            resultado = (banderaPorDecimales) ? 0 : resultado;
         } while ((resultado <= 0) || (resultado >= 1000));
         return resultado;
     }

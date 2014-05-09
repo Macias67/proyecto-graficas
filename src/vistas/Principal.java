@@ -4,17 +4,38 @@
  */
 package vistas;
 
+import controlador.NumerosJuego;
+import javax.swing.JToggleButton;
+import modelo.NumeroAleatorio;
+
 /**
  *
  * @author Macias
  */
 public class Principal extends javax.swing.JFrame {
+    
+    private final NumerosJuego numeroJuego;
 
     /**
      * Creates new form Principal
      */
     public Principal() {
         initComponents();
+        numeroJuego = new NumerosJuego();
+        initButtons();
+    }
+    
+    private void initButtons() {
+        JToggleButton[] arrayButtons = {
+            jToggleButton1,
+            jToggleButton2,
+            jToggleButton3,
+            jToggleButton4,
+            jToggleButton5,
+            jToggleButton6,
+            jToggleButton7
+        };
+        numeroJuego.setButtonsNumber(arrayButtons);
     }
 
     /**
