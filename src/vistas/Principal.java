@@ -4,29 +4,34 @@
  */
 package vistas;
 
+import controlador.CalculaRespuesta;
 import controlador.NumerosJuego;
+import controlador.Tiempo;
+import java.awt.Color;
+import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
-import modelo.NumeroAleatorio;
+import modelo.OperadoresString;
 
 /**
  *
  * @author Macias
  */
 public class Principal extends javax.swing.JFrame {
-    
+
     private final NumerosJuego numeroJuego;
+    private final JToggleButton[] arrayButtons;
+    private final CalculaRespuesta calculaRespuesta;
+    private String cadenaCalculo = "";
+    private int SECUENCIA = 2;
+    
+    private final Tiempo tiempo;
 
     /**
      * Creates new form Principal
      */
     public Principal() {
         initComponents();
-        numeroJuego = new NumerosJuego();
-        initButtons();
-    }
-    
-    private void initButtons() {
-        JToggleButton[] arrayButtons = {
+        this.arrayButtons = new JToggleButton[]{
             jToggleButton1,
             jToggleButton2,
             jToggleButton3,
@@ -35,7 +40,104 @@ public class Principal extends javax.swing.JFrame {
             jToggleButton6,
             jToggleButton7
         };
+        this.numeroJuego = NumerosJuego.getInstance();
+        this.calculaRespuesta = new CalculaRespuesta();
+        this.tiempo = new Tiempo();
+    }
+
+    private void initButtons() {
+        numeroJuego.generateNumbers();
         numeroJuego.setButtonsNumber(arrayButtons);
+        jLabelResultado.setText(numeroJuego.getRESULTADO() + "");
+        reset();
+    }
+
+    private void addCadenaToggle(JToggleButton button) {
+        if (maxCaracteres()) {
+            if (ordenSecuencia()) {
+                if (button.isSelected()) {
+                    String string = button.getText();
+                    if (!string.isEmpty()) {
+                        if (cadenaCalculo.isEmpty()) {
+                            cadenaCalculo = string;
+                        } else {
+                            cadenaCalculo += " " + string;
+                        }
+                        refreshCalculo();
+                        SECUENCIA++;
+                    } else {
+                        button.setSelected(false);
+                        JOptionPane.showMessageDialog(this, "No se han iniciado valores", "No hay valores", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    button.setSelected(!button.isSelected());
+                    JOptionPane.showMessageDialog(this, "Ya seleccionaste este botton", "Seleciona otra opción", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                button.setSelected(!button.isSelected());
+                JOptionPane.showMessageDialog(this, "Tienes que colocar un operador", "Falta operador", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            button.setSelected(true);
+            JOptionPane.showMessageDialog(this, "Haz llegado al tope de números", "Máximo de números", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void addCadenaOperador(String string) {
+        if (maxCaracteres()) {
+            if (!ordenSecuencia()) {
+                if (!string.isEmpty()) {
+                    if (cadenaCalculo.isEmpty()) {
+                        cadenaCalculo = string;
+                    } else {
+                        cadenaCalculo += " " + string;
+                    }
+                    jLabelCalculo.setText(cadenaCalculo);
+                    SECUENCIA++;
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se han iniciado valores", "No hay valores", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Tienes que colocar un número", "Falta número", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Haz llegado al tope de números", "Máximo de números", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private boolean ordenSecuencia() {
+        return (SECUENCIA % 2 == 0);
+    }
+
+    private boolean maxCaracteres() {
+        return (SECUENCIA < 15);
+    }
+
+    private void refreshCalculo() {
+        jLabelCalculo.setText(cadenaCalculo);
+        jLabelCuenta.setText(calculaRespuesta.resultado(cadenaCalculo) + "");
+        if (calculaRespuesta.encuentraRespuesta()) {
+            jLabelEstado.setText("=");
+            jLabelCuenta.setForeground(Color.GREEN);
+            jLabelEstado.setForeground(Color.GREEN);
+            jLabelResultado.setForeground(Color.GREEN);
+        }
+    }
+
+    private void reset() {
+        SECUENCIA = 2;
+        cadenaCalculo = "";
+        jLabelCalculo.setText("");
+
+        jLabelCuenta.setText("0");
+        jLabelEstado.setText("!=");
+
+        jLabelCuenta.setForeground(Color.RED);
+        jLabelEstado.setForeground(Color.RED);
+        jLabelResultado.setForeground(Color.RED);
+        for (JToggleButton button : arrayButtons) {
+            button.setSelected(false);
+        }
     }
 
     /**
@@ -50,8 +152,8 @@ public class Principal extends javax.swing.JFrame {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jProgressBar = new javax.swing.JProgressBar();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btnGenerar = new javax.swing.JButton();
+        jButtonInicio = new javax.swing.JButton();
         jButtonSuma = new javax.swing.JButton();
         jButtonResta = new javax.swing.JButton();
         jButtonProducto = new javax.swing.JButton();
@@ -67,39 +169,79 @@ public class Principal extends javax.swing.JFrame {
         jToggleButton7 = new javax.swing.JToggleButton();
         jPanelResultado = new javax.swing.JPanel();
         jLabelEstado = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
         jLabelResultado = new javax.swing.JLabel();
+        jLabelCuenta = new javax.swing.JLabel();
+        jButtonReiniciar = new javax.swing.JButton();
+        jButtonParar = new javax.swing.JButton();
+        jButtonPausa = new javax.swing.JButton();
+        jButtonContinuar = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jProgressBar.setToolTipText("00:45");
 
-        jButton1.setText("Generar");
+        btnGenerar.setText("Generar");
+        btnGenerar.setFocusable(false);
+        btnGenerar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGenerarActionPerformed(evt);
+            }
+        });
 
-        jButton2.setText("Iniciar");
+        jButtonInicio.setText("Iniciar");
+        jButtonInicio.setFocusable(false);
+        jButtonInicio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonInicioActionPerformed(evt);
+            }
+        });
 
         jButtonSuma.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
         jButtonSuma.setText("+");
+        jButtonSuma.setFocusable(false);
         jButtonSuma.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonSuma.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonSumaActionPerformed(evt);
+            }
+        });
 
         jButtonResta.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
         jButtonResta.setText("-");
+        jButtonResta.setFocusable(false);
         jButtonResta.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonResta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRestaActionPerformed(evt);
+            }
+        });
 
         jButtonProducto.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
         jButtonProducto.setText("x");
+        jButtonProducto.setFocusable(false);
         jButtonProducto.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonProducto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonProductoActionPerformed(evt);
+            }
+        });
 
         jButtonCociente.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
         jButtonCociente.setText("/");
+        jButtonCociente.setFocusable(false);
         jButtonCociente.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonCociente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonCocienteActionPerformed(evt);
+            }
+        });
 
-        jPanelCalculo.setBorder(javax.swing.BorderFactory.createBevelBorder(0));
+        jPanelCalculo.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         jLabelCalculo.setFont(new java.awt.Font("Tahoma", 1, 30)); // NOI18N
         jLabelCalculo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelCalculo.setText(" 5 + 6 - 9 * 8 * 9 - 1 / 52");
+        jLabelCalculo.setText("¡Bienvenido!");
 
         javax.swing.GroupLayout jPanelCalculoLayout = new javax.swing.GroupLayout(jPanelCalculo);
         jPanelCalculo.setLayout(jPanelCalculoLayout);
@@ -119,40 +261,77 @@ public class Principal extends javax.swing.JFrame {
         );
 
         jToggleButton1.setFont(new java.awt.Font("Tahoma", 0, 26)); // NOI18N
-        jToggleButton1.setText("86");
+        jToggleButton1.setFocusable(false);
+        jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton1ActionPerformed(evt);
+            }
+        });
 
         jToggleButton2.setFont(new java.awt.Font("Tahoma", 0, 26)); // NOI18N
-        jToggleButton2.setText("86");
+        jToggleButton2.setFocusable(false);
+        jToggleButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton2ActionPerformed(evt);
+            }
+        });
 
         jToggleButton3.setFont(new java.awt.Font("Tahoma", 0, 26)); // NOI18N
-        jToggleButton3.setText("86");
+        jToggleButton3.setFocusable(false);
+        jToggleButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton3ActionPerformed(evt);
+            }
+        });
 
         jToggleButton4.setFont(new java.awt.Font("Tahoma", 0, 26)); // NOI18N
-        jToggleButton4.setText("86");
+        jToggleButton4.setFocusable(false);
+        jToggleButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton4ActionPerformed(evt);
+            }
+        });
 
         jToggleButton5.setFont(new java.awt.Font("Tahoma", 0, 26)); // NOI18N
-        jToggleButton5.setText("86");
+        jToggleButton5.setFocusable(false);
+        jToggleButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton5ActionPerformed(evt);
+            }
+        });
 
         jToggleButton6.setFont(new java.awt.Font("Tahoma", 0, 26)); // NOI18N
-        jToggleButton6.setText("86");
+        jToggleButton6.setFocusable(false);
+        jToggleButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton6ActionPerformed(evt);
+            }
+        });
 
         jToggleButton7.setFont(new java.awt.Font("Tahoma", 0, 26)); // NOI18N
-        jToggleButton7.setText("86");
+        jToggleButton7.setFocusable(false);
+        jToggleButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton7ActionPerformed(evt);
+            }
+        });
 
-        jPanelResultado.setBorder(javax.swing.BorderFactory.createBevelBorder(0));
+        jPanelResultado.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         jLabelEstado.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
         jLabelEstado.setForeground(new java.awt.Color(204, 0, 0));
         jLabelEstado.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabelEstado.setText("!=");
 
-        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(204, 0, 0));
-        jLabel3.setText("999");
-
         jLabelResultado.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
         jLabelResultado.setForeground(new java.awt.Color(204, 0, 0));
-        jLabelResultado.setText("999");
+        jLabelResultado.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabelResultado.setText("0");
+
+        jLabelCuenta.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
+        jLabelCuenta.setForeground(new java.awt.Color(204, 0, 0));
+        jLabelCuenta.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabelCuenta.setText("0");
 
         javax.swing.GroupLayout jPanelResultadoLayout = new javax.swing.GroupLayout(jPanelResultado);
         jPanelResultado.setLayout(jPanelResultadoLayout);
@@ -160,11 +339,11 @@ public class Principal extends javax.swing.JFrame {
             jPanelResultadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelResultadoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabelResultado)
+                .addComponent(jLabelCuenta, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabelEstado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabelResultado, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanelResultadoLayout.setVerticalGroup(
@@ -172,10 +351,39 @@ public class Principal extends javax.swing.JFrame {
             .addGroup(jPanelResultadoLayout.createSequentialGroup()
                 .addGroup(jPanelResultadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabelEstado)
-                    .addComponent(jLabelResultado))
+                    .addComponent(jLabelCuenta))
                 .addGap(0, 0, Short.MAX_VALUE))
-            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jLabelResultado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
+
+        jButtonReiniciar.setText("Reiniciar");
+        jButtonReiniciar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonReiniciarActionPerformed(evt);
+            }
+        });
+
+        jButtonParar.setText("Parar");
+        jButtonParar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonPararActionPerformed(evt);
+            }
+        });
+
+        jButtonPausa.setText("Pausa");
+        jButtonPausa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonPausaActionPerformed(evt);
+            }
+        });
+
+        jButtonContinuar.setText("Continuar");
+        jButtonContinuar.setToolTipText("");
+        jButtonContinuar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonContinuarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -185,10 +393,18 @@ public class Principal extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jButton1)
+                        .addComponent(btnGenerar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2)
-                        .addGap(322, 322, 322))
+                        .addComponent(jButtonReiniciar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonInicio)
+                        .addGap(4, 4, 4)
+                        .addComponent(jButtonPausa)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonContinuar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonParar)
+                        .addGap(17, 17, 17))
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(jProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanelCalculo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -220,7 +436,7 @@ public class Principal extends javax.swing.JFrame {
                 .addContainerGap(19, Short.MAX_VALUE))
         );
 
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButton1, jButton2});
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnGenerar, jButtonInicio});
 
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -252,8 +468,12 @@ public class Principal extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 69, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton1)
-                            .addComponent(jButton2))
+                            .addComponent(btnGenerar)
+                            .addComponent(jButtonInicio)
+                            .addComponent(jButtonReiniciar)
+                            .addComponent(jButtonParar)
+                            .addComponent(jButtonPausa)
+                            .addComponent(jButtonContinuar))
                         .addContainerGap())))
         );
 
@@ -292,6 +512,92 @@ public class Principal extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+        // TODO add your handling code here:
+        addCadenaToggle(jToggleButton1);
+    }//GEN-LAST:event_jToggleButton1ActionPerformed
+
+    private void jToggleButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton2ActionPerformed
+        // TODO add your handling code here:
+        addCadenaToggle(jToggleButton2);
+    }//GEN-LAST:event_jToggleButton2ActionPerformed
+
+    private void jToggleButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton3ActionPerformed
+        // TODO add your handling code here:
+        addCadenaToggle(jToggleButton3);
+    }//GEN-LAST:event_jToggleButton3ActionPerformed
+
+    private void jToggleButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton4ActionPerformed
+        // TODO add your handling code here:
+        addCadenaToggle(jToggleButton4);
+    }//GEN-LAST:event_jToggleButton4ActionPerformed
+
+    private void jToggleButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton5ActionPerformed
+        // TODO add your handling code here:
+        addCadenaToggle(jToggleButton5);
+    }//GEN-LAST:event_jToggleButton5ActionPerformed
+
+    private void jToggleButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton6ActionPerformed
+        // TODO add your handling code here:
+        addCadenaToggle(jToggleButton6);
+    }//GEN-LAST:event_jToggleButton6ActionPerformed
+
+    private void jToggleButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton7ActionPerformed
+        // TODO add your handling code here:
+        addCadenaToggle(jToggleButton7);
+    }//GEN-LAST:event_jToggleButton7ActionPerformed
+
+    private void jButtonSumaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSumaActionPerformed
+        // TODO add your handling code here:
+        addCadenaOperador(OperadoresString.SUMA.getValue());
+    }//GEN-LAST:event_jButtonSumaActionPerformed
+
+    private void jButtonRestaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRestaActionPerformed
+        // TODO add your handling code here:
+        addCadenaOperador(OperadoresString.RESTA.getValue());
+    }//GEN-LAST:event_jButtonRestaActionPerformed
+
+    private void jButtonProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonProductoActionPerformed
+        // TODO add your handling code here:
+        addCadenaOperador(OperadoresString.PRODUCTO.getValue());
+    }//GEN-LAST:event_jButtonProductoActionPerformed
+
+    private void jButtonCocienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCocienteActionPerformed
+        // TODO add your handling code here:
+        addCadenaOperador(OperadoresString.COCIENTE.getValue());
+    }//GEN-LAST:event_jButtonCocienteActionPerformed
+
+    private void btnGenerarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarActionPerformed
+        // TODO add your handling code here:
+        initButtons();
+        System.out.println(numeroJuego.mostrarResultado());
+    }//GEN-LAST:event_btnGenerarActionPerformed
+
+    private void jButtonReiniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonReiniciarActionPerformed
+        // TODO add your handling code here:
+        reset();
+    }//GEN-LAST:event_jButtonReiniciarActionPerformed
+
+    private void jButtonInicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonInicioActionPerformed
+        // TODO add your handling code here:
+        tiempo.play();
+    }//GEN-LAST:event_jButtonInicioActionPerformed
+
+    private void jButtonPararActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPararActionPerformed
+        // TODO add your handling code here:
+        tiempo.stop();
+    }//GEN-LAST:event_jButtonPararActionPerformed
+
+    private void jButtonPausaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPausaActionPerformed
+        // TODO add your handling code here:
+        tiempo.pause();
+    }//GEN-LAST:event_jButtonPausaActionPerformed
+
+    private void jButtonContinuarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonContinuarActionPerformed
+        // TODO add your handling code here:
+        tiempo.resume();
+    }//GEN-LAST:event_jButtonContinuarActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -319,14 +625,18 @@ public class Principal extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton btnGenerar;
     private javax.swing.JButton jButtonCociente;
+    private javax.swing.JButton jButtonContinuar;
+    private javax.swing.JButton jButtonInicio;
+    private javax.swing.JButton jButtonParar;
+    private javax.swing.JButton jButtonPausa;
     private javax.swing.JButton jButtonProducto;
+    private javax.swing.JButton jButtonReiniciar;
     private javax.swing.JButton jButtonResta;
     private javax.swing.JButton jButtonSuma;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabelCalculo;
+    private javax.swing.JLabel jLabelCuenta;
     private javax.swing.JLabel jLabelEstado;
     private javax.swing.JLabel jLabelResultado;
     private javax.swing.JPanel jPanel1;

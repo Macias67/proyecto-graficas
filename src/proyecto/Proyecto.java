@@ -4,9 +4,6 @@
  */
 package proyecto;
 
-import controlador.NumerosJuego;
-import java.util.ArrayList;
-import modelo.Operadores;
 import vistas.Principal;
 
 /**

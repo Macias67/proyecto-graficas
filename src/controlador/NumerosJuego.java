@@ -5,9 +5,11 @@
 package controlador;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import javax.swing.JToggleButton;
 import modelo.NumeroAleatorio;
 import modelo.Operadores;
+import modelo.OperadoresString;
 
 /**
  *
@@ -15,13 +17,26 @@ import modelo.Operadores;
  */
 public class NumerosJuego {
 
-    private final ArrayList<Integer> NUMEROS;
+    private static NumerosJuego INSTANCE;
+    
+    private ArrayList<Integer> NUMEROS;
     private ArrayList<Operadores> LISTA_OPERADORES;
-    private final int RESULTADO;
+    private int RESULTADO;
+    
     private final int MAX_NUMEROS_USADOS = 7;
     private final int MIN_NUMEROS_USADOS = 4;
 
-    public NumerosJuego() {
+    private NumerosJuego() {  
+    }
+    
+    public static NumerosJuego getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new NumerosJuego();
+        }
+        return INSTANCE;
+    }
+    
+    public void generateNumbers() {
         NUMEROS = getListaNumeros();
         RESULTADO = resultado();
     }
@@ -40,28 +55,26 @@ public class NumerosJuego {
 
     public void setButtonsNumber(JToggleButton[] buttons) {
         if (buttons.length == MAX_NUMEROS_USADOS) {
-            
-            int totalNumeros = NUMEROS.size();
 
-            if (totalNumeros < MAX_NUMEROS_USADOS) {
-                
-                int diferencia = MAX_NUMEROS_USADOS - totalNumeros;
-                
-                for (int i = 0; i < totalNumeros; i++) {
-                    if (i == totalNumeros - 1) {
-                        buttons[MAX_NUMEROS_USADOS-1].setText(NUMEROS.get(i) + "");
-                    } else {
-                        buttons[i].setText(NUMEROS.get(i) + "");
-                    }
+            ArrayList<Integer> listaCompleta = new ArrayList<>();
+
+            for (Integer numero : NUMEROS) {
+                listaCompleta.add(numero);
+            }
+
+            int size = listaCompleta.size();
+
+            if (size < MAX_NUMEROS_USADOS) {
+                int diff = MAX_NUMEROS_USADOS - size;
+                for (int i = 0; i < diff; i++) {
+                    listaCompleta.add(NumeroAleatorio.generaNumero(1, 9));
                 }
-                
-                int continuacion = MAX_NUMEROS_USADOS - diferencia - 1;
-                
-                System.out.println(continuacion);
-                for (; continuacion < totalNumeros-1; continuacion++) {
-                    System.out.println(continuacion);
-                }
-                System.out.println(NUMEROS);
+            }
+
+            Collections.shuffle(listaCompleta);
+
+            for (int i = 0; i < listaCompleta.size(); i++) {
+                buttons[i].setText(listaCompleta.get(i) + "");
             }
         }
     }
@@ -128,7 +141,18 @@ public class NumerosJuego {
                 break;
             }
             resultado = (banderaPorDecimales) ? 0 : resultado;
-        } while ((resultado <= 0) || (resultado >= 1000));
+        } while ((resultado <= 99) || (resultado >= 1000));
+        return resultado;
+    }
+    
+    public String mostrarResultado() {
+        String resultado = "";
+        for (int i = 0; i < NUMEROS.size(); i++) {
+            resultado += NUMEROS.get(i);
+            if (i != NUMEROS.size()-1) {
+                resultado += " "+OperadoresString.valueOf(LISTA_OPERADORES.get(i).name()).getValue()+" ";
+            }
+        }
         return resultado;
     }
 }
