@@ -21,10 +21,11 @@ public class Principal extends javax.swing.JFrame {
     private final NumerosJuego numeroJuego;
     private final JToggleButton[] arrayButtons;
     private final CalculaRespuesta calculaRespuesta;
+    private Tiempo tiempo;
     private String cadenaCalculo = "";
     private int SECUENCIA = 2;
 
-    private final Tiempo tiempo;
+    private boolean INICIO = false;
 
     /**
      * Creates new form Principal
@@ -42,68 +43,80 @@ public class Principal extends javax.swing.JFrame {
         };
         this.numeroJuego = NumerosJuego.getInstance();
         this.calculaRespuesta = new CalculaRespuesta();
-        this.tiempo = new Tiempo();
     }
 
     public void initButtons() {
         numeroJuego.generateNumbers();
         numeroJuego.setButtonsNumber(arrayButtons);
         jLabelResultado.setText(numeroJuego.getRESULTADO() + "");
-        jButtonInicio.setEnabled(true);
         reset();
+        btnGenerar.setEnabled(true);
+        btnIniciar.setEnabled(false);
+        btnReiniciar.setEnabled(false);
+        jTabbedPane.setEnabled(true);
+        INICIO = false;
         System.out.println(numeroJuego.mostrarResultado());
     }
 
     private void addCadenaToggle(JToggleButton button) {
-        if (maxCaracteres()) {
-            if (ordenSecuencia()) {
-                if (button.isSelected()) {
-                    String string = button.getText();
+        if (INICIO) {
+            if (maxCaracteres()) {
+                if (ordenSecuencia()) {
+                    if (button.isSelected()) {
+                        String string = button.getText();
+                        if (!string.isEmpty()) {
+                            if (cadenaCalculo.isEmpty()) {
+                                cadenaCalculo = string;
+                            } else {
+                                cadenaCalculo += " " + string;
+                            }
+                            refreshCalculo();
+                            SECUENCIA++;
+                        } else {
+                            button.setSelected(false);
+                            JOptionPane.showMessageDialog(this, "No se han iniciado valores", "No hay valores", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } else {
+                        button.setSelected(!button.isSelected());
+                        JOptionPane.showMessageDialog(this, "Ya seleccionaste este botton", "Seleciona otra opción", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    button.setSelected(!button.isSelected());
+                    JOptionPane.showMessageDialog(this, "Tienes que colocar un operador", "Falta operador", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                button.setSelected(true);
+                JOptionPane.showMessageDialog(this, "Haz llegado al tope de números", "Máximo de números", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            button.setSelected(false);
+            JOptionPane.showMessageDialog(this, "Inicia el juego", "Inicia", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void addCadenaOperador(String string) {
+        if (INICIO) {
+            if (maxCaracteres()) {
+                if (!ordenSecuencia()) {
                     if (!string.isEmpty()) {
                         if (cadenaCalculo.isEmpty()) {
                             cadenaCalculo = string;
                         } else {
                             cadenaCalculo += " " + string;
                         }
-                        refreshCalculo();
+                        jLabelCalculo.setText(cadenaCalculo);
                         SECUENCIA++;
                     } else {
-                        button.setSelected(false);
                         JOptionPane.showMessageDialog(this, "No se han iniciado valores", "No hay valores", JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
-                    button.setSelected(!button.isSelected());
-                    JOptionPane.showMessageDialog(this, "Ya seleccionaste este botton", "Seleciona otra opción", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Tienes que colocar un número", "Falta número", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
-                button.setSelected(!button.isSelected());
-                JOptionPane.showMessageDialog(this, "Tienes que colocar un operador", "Falta operador", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Haz llegado al tope de números", "Máximo de números", JOptionPane.ERROR_MESSAGE);
             }
         } else {
-            button.setSelected(true);
-            JOptionPane.showMessageDialog(this, "Haz llegado al tope de números", "Máximo de números", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void addCadenaOperador(String string) {
-        if (maxCaracteres()) {
-            if (!ordenSecuencia()) {
-                if (!string.isEmpty()) {
-                    if (cadenaCalculo.isEmpty()) {
-                        cadenaCalculo = string;
-                    } else {
-                        cadenaCalculo += " " + string;
-                    }
-                    jLabelCalculo.setText(cadenaCalculo);
-                    SECUENCIA++;
-                } else {
-                    JOptionPane.showMessageDialog(this, "No se han iniciado valores", "No hay valores", JOptionPane.ERROR_MESSAGE);
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "Tienes que colocar un número", "Falta número", JOptionPane.ERROR_MESSAGE);
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "Haz llegado al tope de números", "Máximo de números", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Iniciar el juego", "Inicia", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -123,20 +136,19 @@ public class Principal extends javax.swing.JFrame {
             jLabelCuenta.setForeground(Color.GREEN);
             jLabelEstado.setForeground(Color.GREEN);
             jLabelResultado.setForeground(Color.GREEN);
-            tiempo.detener();
-            JOptionPane.showMessageDialog(this, "¡Increíble! Has ganado, felicidades...", "Ganador", JOptionPane.INFORMATION_MESSAGE);
+            this.tiempo.stop();
+            JOptionPane.showMessageDialog(this, "¡Increíble! Has ganado, felicidades :D", "Ganador", JOptionPane.INFORMATION_MESSAGE);
             initButtons();
         }
     }
 
     private void reset() {
         SECUENCIA = 2;
-        System.out.println(SECUENCIA);
         cadenaCalculo = "";
-        
+
         jProgressBar.setValue(0);
         jProgressBar.setString("00:00");
-        
+
         jLabelCalculo.setText("");
 
         jLabelCuenta.setText("0");
@@ -159,11 +171,9 @@ public class Principal extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jTabbedPane = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jProgressBar = new javax.swing.JProgressBar();
-        btnGenerar = new javax.swing.JButton();
-        jButtonInicio = new javax.swing.JButton();
         jButtonSuma = new javax.swing.JButton();
         jButtonResta = new javax.swing.JButton();
         jButtonProducto = new javax.swing.JButton();
@@ -181,30 +191,18 @@ public class Principal extends javax.swing.JFrame {
         jLabelEstado = new javax.swing.JLabel();
         jLabelResultado = new javax.swing.JLabel();
         jLabelCuenta = new javax.swing.JLabel();
-        jButtonReiniciar = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JSeparator();
+        btnReiniciar = new javax.swing.JButton();
+        btnGenerar = new javax.swing.JButton();
+        btnIniciar = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jTabbedPane.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+
         jProgressBar.setToolTipText("00:45");
         jProgressBar.setString("00:00");
-
-        btnGenerar.setText("Generar");
-        btnGenerar.setFocusable(false);
-        btnGenerar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGenerarActionPerformed(evt);
-            }
-        });
-
-        jButtonInicio.setText("Iniciar");
-        jButtonInicio.setEnabled(false);
-        jButtonInicio.setFocusable(false);
-        jButtonInicio.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonInicioActionPerformed(evt);
-            }
-        });
 
         jButtonSuma.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
         jButtonSuma.setText("+");
@@ -365,10 +363,29 @@ public class Principal extends javax.swing.JFrame {
             .addComponent(jLabelResultado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        jButtonReiniciar.setText("Reiniciar");
-        jButtonReiniciar.addActionListener(new java.awt.event.ActionListener() {
+        btnReiniciar.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        btnReiniciar.setText("Reiniciar");
+        btnReiniciar.setEnabled(false);
+        btnReiniciar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonReiniciarActionPerformed(evt);
+                btnReiniciarActionPerformed(evt);
+            }
+        });
+
+        btnGenerar.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        btnGenerar.setText("Generar");
+        btnGenerar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGenerarActionPerformed(evt);
+            }
+        });
+
+        btnIniciar.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        btnIniciar.setText("INICIAR");
+        btnIniciar.setEnabled(false);
+        btnIniciar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnIniciarActionPerformed(evt);
             }
         });
 
@@ -378,47 +395,46 @@ public class Principal extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanelCalculo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(btnGenerar)
+                        .addComponent(jButtonSuma, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonReiniciar)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jButtonResta, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButtonProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jPanelResultado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonInicio)
-                        .addGap(232, 232, 232))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanelCalculo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                            .addComponent(jToggleButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jToggleButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jToggleButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jToggleButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jToggleButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jToggleButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jToggleButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addComponent(jButtonSuma, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addComponent(jButtonResta, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jButtonProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addComponent(jPanelResultado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButtonCociente, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(jButtonCociente, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jSeparator1)
+                    .addComponent(btnIniciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jToggleButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jToggleButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jToggleButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jToggleButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jToggleButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jToggleButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jToggleButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(btnGenerar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(244, 244, 244)
+                                .addComponent(btnReiniciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                 .addContainerGap(19, Short.MAX_VALUE))
         );
-
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnGenerar, jButtonInicio});
-
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -441,21 +457,20 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(jButtonResta)
                     .addComponent(jButtonProducto)
                     .addComponent(jButtonCociente))
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanelResultado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(49, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 69, Short.MAX_VALUE)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnGenerar)
-                            .addComponent(jButtonInicio)
-                            .addComponent(jButtonReiniciar))
-                        .addContainerGap())))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanelResultado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnReiniciar)
+                    .addComponent(btnGenerar))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnIniciar, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
-        jTabbedPane1.addTab("Números", jPanel1);
+        jTabbedPane.addTab("Números", jPanel1);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -465,10 +480,10 @@ public class Principal extends javax.swing.JFrame {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 355, Short.MAX_VALUE)
+            .addGap(0, 416, Short.MAX_VALUE)
         );
 
-        jTabbedPane1.addTab("Letras", jPanel2);
+        jTabbedPane.addTab("Letras", jPanel2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -476,14 +491,14 @@ public class Principal extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1)
+                .addComponent(jTabbedPane)
                 .addContainerGap())
         );
 
@@ -548,19 +563,25 @@ public class Principal extends javax.swing.JFrame {
     private void btnGenerarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarActionPerformed
         // TODO add your handling code here:
         initButtons();
+        btnIniciar.setEnabled(true);
     }//GEN-LAST:event_btnGenerarActionPerformed
 
-    private void jButtonReiniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonReiniciarActionPerformed
+    private void btnIniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarActionPerformed
+        // TODO add your handling code here:
+        INICIO = true;
+        btnReiniciar.setEnabled(true);
+        btnGenerar.setEnabled(false);
+        btnIniciar.setEnabled(false);
+        jTabbedPane.setEnabled(false);
+        this.tiempo = new Tiempo();
+        this.tiempo.setElements(jProgressBar, this);
+        this.tiempo.start();
+    }//GEN-LAST:event_btnIniciarActionPerformed
+
+    private void btnReiniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReiniciarActionPerformed
         // TODO add your handling code here:
         reset();
-    }//GEN-LAST:event_jButtonReiniciarActionPerformed
-
-    private void jButtonInicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonInicioActionPerformed
-        // TODO add your handling code here:
-        tiempo.init();
-        tiempo.setProgress(jProgressBar);
-        tiempo.setPrincipal(this);
-    }//GEN-LAST:event_jButtonInicioActionPerformed
+    }//GEN-LAST:event_btnReiniciarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -590,10 +611,10 @@ public class Principal extends javax.swing.JFrame {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGenerar;
+    private javax.swing.JButton btnIniciar;
+    private javax.swing.JButton btnReiniciar;
     private javax.swing.JButton jButtonCociente;
-    private javax.swing.JButton jButtonInicio;
     private javax.swing.JButton jButtonProducto;
-    private javax.swing.JButton jButtonReiniciar;
     private javax.swing.JButton jButtonResta;
     private javax.swing.JButton jButtonSuma;
     private javax.swing.JLabel jLabelCalculo;
@@ -605,7 +626,8 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanelCalculo;
     private javax.swing.JPanel jPanelResultado;
     private javax.swing.JProgressBar jProgressBar;
-    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JToggleButton jToggleButton2;
     private javax.swing.JToggleButton jToggleButton3;

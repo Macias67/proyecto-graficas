@@ -10,6 +10,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
+import javax.swing.JToggleButton;
 import vistas.Principal;
 
 /**
@@ -18,67 +19,52 @@ import vistas.Principal;
  */
 public class Tiempo {
 
-    private Timer timer;
-    private AccionTimer timerTask;
+    private final Timer timer;
+    private final TimerTask timerTask;
+    private final SimpleDateFormat simpleDateFormat;
+    private JToggleButton[] arregloBotones;
+    private JProgressBar barra;
+    private Principal frame;
+    private NumerosJuego numerosJuego;
+    private int CONTADOR = 0;
+    private final int TIEMPO = 45000;
 
     public Tiempo() {
-        
-    }
-
-    public void init() {
         this.timer = new Timer();
-        this.timerTask = new AccionTimer();
-        this.timer.schedule(timerTask, 0, 1);
-    }
-    
-    public void setProgress(JProgressBar barra) {
-        this.timerTask.setProgressBar(barra);
+        this.simpleDateFormat = new SimpleDateFormat("ss:SSS");
+
+        this.timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                if (CONTADOR < TIEMPO) {
+                    CONTADOR++;
+                    barra.setValue(CONTADOR / 1000);
+                    barra.setString(simpleDateFormat.format(CONTADOR));
+                } else {
+                    cancel();
+                    numerosJuego = NumerosJuego.getInstance();
+                    JOptionPane.showMessageDialog(barra.getParent(), "Se termino el tiempo, ¡Perdedor! \n Posible resultado: " + numerosJuego.mostrarResultado(), "Perdiste", JOptionPane.INFORMATION_MESSAGE);
+                    frame.initButtons();
+                }
+            }
+        };
+
     }
 
-    public void setPrincipal(Principal p) {
-        timerTask.setPrincial(p);
+    public void setElements(JProgressBar barra, Principal frame) {
+        this.barra = barra;
+        this.barra.setMaximum(TIEMPO / 1000);
+        this.barra.setStringPainted(true);
+        this.frame = frame;
     }
 
-    public void detener() {
+    public void start() {
+        this.timer.scheduleAtFixedRate(timerTask, 0, 1);
+    }
+
+    public void stop() {
         this.timer.cancel();
         this.timer.purge();
-    }
-
-    private class AccionTimer extends TimerTask {
-
-        private JProgressBar barra;
-        private Principal princial;
-        private final SimpleDateFormat sdf;
-        private int CONTADOR = 0;
-        private NumerosJuego numerosJuego;
-
-        public AccionTimer() {
-            sdf = new SimpleDateFormat("ss:SSS"); 
-        }
-
-        public void setProgressBar(JProgressBar barra) {
-            this.barra = barra;
-            this.barra.setMaximum(45);
-            this.barra.setStringPainted(true);
-        }
-
-        public void setPrincial(Principal princial) {
-            this.princial = princial;
-        }
-
-        @Override
-        public void run() {
-            if (CONTADOR < 45000) {
-                CONTADOR++;
-                this.barra.setValue(CONTADOR / 1000);
-                this.barra.setString(sdf.format(CONTADOR));
-            } else {
-                cancel();
-                numerosJuego = NumerosJuego.getInstance();
-                JOptionPane.showMessageDialog(barra.getParent(), "Se termino el tiempo, ¡Perdedor! \n Posible resultado: "+numerosJuego.mostrarResultado(), "Perdiste", JOptionPane.INFORMATION_MESSAGE);
-                princial.initButtons();
-            }
-        }
     }
 
 }
