@@ -18,5 +18,10 @@ public class Proyecto {
     public static void main(String[] args) {
         // TODO code application logic here
         Principal.main(args);
+//        GeneraPalabra gp = new GeneraPalabra();
+//        gp.generarPalabra();
+//        System.out.println(gp.getPALABRA_FINAL());
+//        System.out.println(gp.getDEFINICION());
+//        System.out.println(gp.getListaLetras());
     }
 }
