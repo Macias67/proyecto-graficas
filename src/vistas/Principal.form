@@ -66,13 +66,7 @@
                               <Component id="jButtonReiniciar" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jButtonInicio" linkSize="1" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
-                              <Component id="jButtonPausa" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jButtonContinuar" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jButtonParar" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="232" max="-2" attributes="0"/>
                           </Group>
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
                               <Component id="jProgressBar" alignment="0" max="32767" attributes="0"/>
@@ -148,9 +142,6 @@
                                   <Component id="btnGenerar" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="jButtonInicio" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="jButtonReiniciar" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jButtonParar" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jButtonPausa" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jButtonContinuar" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -163,6 +154,9 @@
             <Component class="javax.swing.JProgressBar" name="jProgressBar">
               <Properties>
                 <Property name="toolTipText" type="java.lang.String" value="00:45"/>
+                <Property name="string" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="&quot;00:00&quot;" type="code"/>
+                </Property>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="btnGenerar">
@@ -177,6 +171,7 @@
             <Component class="javax.swing.JButton" name="jButtonInicio">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Iniciar"/>
+                <Property name="enabled" type="boolean" value="false"/>
                 <Property name="focusable" type="boolean" value="false"/>
               </Properties>
               <Events>
@@ -434,31 +429,6 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonReiniciarActionPerformed"/>
-              </Events>
-            </Component>
-            <Component class="javax.swing.JButton" name="jButtonParar">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Parar"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonPararActionPerformed"/>
-              </Events>
-            </Component>
-            <Component class="javax.swing.JButton" name="jButtonPausa">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Pausa"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonPausaActionPerformed"/>
-              </Events>
-            </Component>
-            <Component class="javax.swing.JButton" name="jButtonContinuar">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Continuar"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonContinuarActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>

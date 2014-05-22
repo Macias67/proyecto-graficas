@@ -23,7 +23,7 @@ public class Principal extends javax.swing.JFrame {
     private final CalculaRespuesta calculaRespuesta;
     private String cadenaCalculo = "";
     private int SECUENCIA = 2;
-    
+
     private final Tiempo tiempo;
 
     /**
@@ -45,11 +45,13 @@ public class Principal extends javax.swing.JFrame {
         this.tiempo = new Tiempo();
     }
 
-    private void initButtons() {
+    public void initButtons() {
         numeroJuego.generateNumbers();
         numeroJuego.setButtonsNumber(arrayButtons);
         jLabelResultado.setText(numeroJuego.getRESULTADO() + "");
+        jButtonInicio.setEnabled(true);
         reset();
+        System.out.println(numeroJuego.mostrarResultado());
     }
 
     private void addCadenaToggle(JToggleButton button) {
@@ -121,12 +123,20 @@ public class Principal extends javax.swing.JFrame {
             jLabelCuenta.setForeground(Color.GREEN);
             jLabelEstado.setForeground(Color.GREEN);
             jLabelResultado.setForeground(Color.GREEN);
+            tiempo.detener();
+            JOptionPane.showMessageDialog(this, "¡Increíble! Has ganado, felicidades...", "Ganador", JOptionPane.INFORMATION_MESSAGE);
+            initButtons();
         }
     }
 
     private void reset() {
         SECUENCIA = 2;
+        System.out.println(SECUENCIA);
         cadenaCalculo = "";
+        
+        jProgressBar.setValue(0);
+        jProgressBar.setString("00:00");
+        
         jLabelCalculo.setText("");
 
         jLabelCuenta.setText("0");
@@ -172,14 +182,12 @@ public class Principal extends javax.swing.JFrame {
         jLabelResultado = new javax.swing.JLabel();
         jLabelCuenta = new javax.swing.JLabel();
         jButtonReiniciar = new javax.swing.JButton();
-        jButtonParar = new javax.swing.JButton();
-        jButtonPausa = new javax.swing.JButton();
-        jButtonContinuar = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jProgressBar.setToolTipText("00:45");
+        jProgressBar.setString("00:00");
 
         btnGenerar.setText("Generar");
         btnGenerar.setFocusable(false);
@@ -190,6 +198,7 @@ public class Principal extends javax.swing.JFrame {
         });
 
         jButtonInicio.setText("Iniciar");
+        jButtonInicio.setEnabled(false);
         jButtonInicio.setFocusable(false);
         jButtonInicio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -363,28 +372,6 @@ public class Principal extends javax.swing.JFrame {
             }
         });
 
-        jButtonParar.setText("Parar");
-        jButtonParar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonPararActionPerformed(evt);
-            }
-        });
-
-        jButtonPausa.setText("Pausa");
-        jButtonPausa.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonPausaActionPerformed(evt);
-            }
-        });
-
-        jButtonContinuar.setText("Continuar");
-        jButtonContinuar.setToolTipText("");
-        jButtonContinuar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonContinuarActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -398,13 +385,7 @@ public class Principal extends javax.swing.JFrame {
                         .addComponent(jButtonReiniciar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButtonInicio)
-                        .addGap(4, 4, 4)
-                        .addComponent(jButtonPausa)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonContinuar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonParar)
-                        .addGap(17, 17, 17))
+                        .addGap(232, 232, 232))
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(jProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanelCalculo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -470,10 +451,7 @@ public class Principal extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnGenerar)
                             .addComponent(jButtonInicio)
-                            .addComponent(jButtonReiniciar)
-                            .addComponent(jButtonParar)
-                            .addComponent(jButtonPausa)
-                            .addComponent(jButtonContinuar))
+                            .addComponent(jButtonReiniciar))
                         .addContainerGap())))
         );
 
@@ -570,7 +548,6 @@ public class Principal extends javax.swing.JFrame {
     private void btnGenerarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarActionPerformed
         // TODO add your handling code here:
         initButtons();
-        System.out.println(numeroJuego.mostrarResultado());
     }//GEN-LAST:event_btnGenerarActionPerformed
 
     private void jButtonReiniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonReiniciarActionPerformed
@@ -580,23 +557,10 @@ public class Principal extends javax.swing.JFrame {
 
     private void jButtonInicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonInicioActionPerformed
         // TODO add your handling code here:
-        tiempo.play();
+        tiempo.init();
+        tiempo.setProgress(jProgressBar);
+        tiempo.setPrincipal(this);
     }//GEN-LAST:event_jButtonInicioActionPerformed
-
-    private void jButtonPararActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPararActionPerformed
-        // TODO add your handling code here:
-        tiempo.stop();
-    }//GEN-LAST:event_jButtonPararActionPerformed
-
-    private void jButtonPausaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPausaActionPerformed
-        // TODO add your handling code here:
-        tiempo.pause();
-    }//GEN-LAST:event_jButtonPausaActionPerformed
-
-    private void jButtonContinuarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonContinuarActionPerformed
-        // TODO add your handling code here:
-        tiempo.resume();
-    }//GEN-LAST:event_jButtonContinuarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -627,10 +591,7 @@ public class Principal extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGenerar;
     private javax.swing.JButton jButtonCociente;
-    private javax.swing.JButton jButtonContinuar;
     private javax.swing.JButton jButtonInicio;
-    private javax.swing.JButton jButtonParar;
-    private javax.swing.JButton jButtonPausa;
     private javax.swing.JButton jButtonProducto;
     private javax.swing.JButton jButtonReiniciar;
     private javax.swing.JButton jButtonResta;

@@ -5,58 +5,78 @@
  */
 package controlador;
 
-import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.util.Timer;
+import java.util.TimerTask;
+import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
+import vistas.Principal;
 
 /**
  *
  * @author Macias
  */
-public class Tiempo implements Runnable {
+public class Tiempo {
 
-    private boolean paused = false;
-    private boolean stopped = false;
-
-    public void play() {
-        paused = false;
-        stopped = false;
-        new Thread(this, "Player").start();
-    }
-
-    public synchronized void pause() {
-        paused = true;
-    }
-
-    public synchronized void resume() {
-        paused = false;
-        notify();
-    }
-
-    public synchronized void stop() {
-        stopped = true;
-// If it was paused then resume and then stop
-        notify();
-    }
+    private Timer timer;
+    private AccionTimer timerTask;
 
     public Tiempo() {
+        
     }
 
-    @Override
-    public void run() {
-        Date t0 = new Date();
-        while (!stopped) {
-            try {
-                synchronized (this) {
-                    if (paused) {
-                        System.out.println("Paused");
-                        wait();
-                        System.out.println("Resumed");
-                    }
-                }
-                long secs = ((new Date()).getTime() - t0.getTime()) / 1000;
-                System.out.println(secs);
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                System.err.println(ex);
+    public void init() {
+        this.timer = new Timer();
+        this.timerTask = new AccionTimer();
+        this.timer.schedule(timerTask, 0, 1);
+    }
+    
+    public void setProgress(JProgressBar barra) {
+        this.timerTask.setProgressBar(barra);
+    }
+
+    public void setPrincipal(Principal p) {
+        timerTask.setPrincial(p);
+    }
+
+    public void detener() {
+        this.timer.cancel();
+        this.timer.purge();
+    }
+
+    private class AccionTimer extends TimerTask {
+
+        private JProgressBar barra;
+        private Principal princial;
+        private final SimpleDateFormat sdf;
+        private int CONTADOR = 0;
+        private NumerosJuego numerosJuego;
+
+        public AccionTimer() {
+            sdf = new SimpleDateFormat("ss:SSS"); 
+        }
+
+        public void setProgressBar(JProgressBar barra) {
+            this.barra = barra;
+            this.barra.setMaximum(45);
+            this.barra.setStringPainted(true);
+        }
+
+        public void setPrincial(Principal princial) {
+            this.princial = princial;
+        }
+
+        @Override
+        public void run() {
+            if (CONTADOR < 45000) {
+                CONTADOR++;
+                this.barra.setValue(CONTADOR / 1000);
+                this.barra.setString(sdf.format(CONTADOR));
+            } else {
+                cancel();
+                numerosJuego = NumerosJuego.getInstance();
+                JOptionPane.showMessageDialog(barra.getParent(), "Se termino el tiempo, ¡Perdedor! \n Posible resultado: "+numerosJuego.mostrarResultado(), "Perdiste", JOptionPane.INFORMATION_MESSAGE);
+                princial.initButtons();
             }
         }
     }
