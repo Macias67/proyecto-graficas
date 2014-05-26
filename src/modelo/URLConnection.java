@@ -30,11 +30,8 @@ public class URLConnection {
         //add request header
         con.setRequestProperty("User-Agent", USER_AGENT);
         con.setRequestProperty("Accept", "application/json");
+        con.setRequestProperty("Accept-Charset", "utf-8");
         con.setRequestProperty("Authorization", "Bearer " + authorization);
-
-//        int responseCode = con.getResponseCode();
-//        System.out.println("\nSending 'GET' request to URL : " + url);
-//        System.out.println("Response Code : " + responseCode);
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
