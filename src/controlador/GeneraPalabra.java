@@ -10,7 +10,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextPane;
 import modelo.JSONParseador;
 import modelo.NumeroAleatorio;
 import modelo.URLConnection;
@@ -34,10 +37,12 @@ public class GeneraPalabra implements Runnable {
     private String DEFINICION;
     private int TOTAL_LETRAS = 9;
     private ArrayList<String> listaLetras;
-    
-    private JLabel label;
 
-    private void generarPalabra() {
+    private JLabel label;
+    private JButton[] botones;
+    private JTextPane textPane;
+
+    private synchronized void generarPalabra() {
         String letras = "";
         int longitud_palabra;
         try {
@@ -80,13 +85,16 @@ public class GeneraPalabra implements Runnable {
                 longitud_palabra = PALABRA_FINAL.length();
 
             } while (longitud_palabra < 4);
-            
+
             mixLetras();
 
         } catch (ParseException ex) {
             Logger.getLogger(GeneraPalabra.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
             Logger.getLogger(GeneraPalabra.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            this.label.setForeground(Color.red);
+            this.label.setText("Intente de nuevo...");
         }
     }
 
@@ -95,7 +103,7 @@ public class GeneraPalabra implements Runnable {
         return palabra;
     }
 
-    private void mixLetras() {
+    private synchronized void mixLetras() {
         char[] letras = PALABRA_FINAL.toCharArray();
         listaLetras = new ArrayList();
         for (int i = 0; i < letras.length; i++) {
@@ -108,7 +116,7 @@ public class GeneraPalabra implements Runnable {
                 listaLetras.add((char) NumeroAleatorio.generaNumero(97, 122) + "");
             }
         }
-        
+
         Collections.shuffle(listaLetras);
     }
 
@@ -126,21 +134,34 @@ public class GeneraPalabra implements Runnable {
 
     @Override
     public void run() {
-        while (PALABRA_FINAL == null && DEFINICION == null) {            
+        while (PALABRA_FINAL == null && DEFINICION == null) {
             this.label.setForeground(Color.red);
             this.label.setText("Generando palabra...");
             generarPalabra();
         }
-        this.label.setText("");
+        this.label.setForeground(Color.green);
+        this.label.setText("Palabra lista");
+        this.setButtonsLetras();
+        this.textPane.setText(DEFINICION);
         System.out.println(PALABRA_FINAL);
         System.out.println(DEFINICION);
         System.out.println(listaLetras);
     }
-    
-    public void iniciar(JLabel label) {
+
+    public void iniciar(JLabel label, JButton[] botones, JTextPane textPane) {
+        this.textPane = textPane;
+        this.botones = botones;
         this.label = label;
         Thread hilo = new Thread(this);
         hilo.start();
     }
-    
+
+    private void setButtonsLetras() {
+        if (botones.length == TOTAL_LETRAS) {
+            for (int i = 0; i < botones.length; i++) {
+                botones[i].setText(listaLetras.get(i).toUpperCase());
+            }
+        }
+    }
+
 }

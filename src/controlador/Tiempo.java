@@ -20,7 +20,7 @@ import vistas.Principal;
 public class Tiempo {
 
     private final Timer timer;
-    private final TimerTask timerTask;
+    private TimerTask timerTask;
     private final SimpleDateFormat simpleDateFormat;
     private JToggleButton[] arregloBotones;
     private JProgressBar barra;
@@ -28,11 +28,21 @@ public class Tiempo {
     private NumerosJuego numerosJuego;
     private int CONTADOR = 0;
     private final int TIEMPO = 45000;
+    private String resp;
 
     public Tiempo() {
         this.timer = new Timer();
         this.simpleDateFormat = new SimpleDateFormat("ss:SSS");
+    }
 
+    public void setElements(JProgressBar barra, Principal frame) {
+        this.barra = barra;
+        this.barra.setMaximum(TIEMPO / 1000);
+        this.barra.setStringPainted(true);
+        this.frame = frame;
+    }
+
+    public void startNumeros() {
         this.timerTask = new TimerTask() {
             @Override
             public void run() {
@@ -48,17 +58,25 @@ public class Tiempo {
                 }
             }
         };
-
+        this.timer.scheduleAtFixedRate(timerTask, 0, 1);
     }
-
-    public void setElements(JProgressBar barra, Principal frame) {
-        this.barra = barra;
-        this.barra.setMaximum(TIEMPO / 1000);
-        this.barra.setStringPainted(true);
-        this.frame = frame;
-    }
-
-    public void start() {
+    
+    public void startLetras(String respuesta) {
+        this.resp = respuesta;
+        this.timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                if (CONTADOR < TIEMPO) {
+                    CONTADOR++;
+                    barra.setValue(CONTADOR / 1000);
+                    barra.setString(simpleDateFormat.format(CONTADOR));
+                } else {
+                    cancel();
+                    JOptionPane.showMessageDialog(barra.getParent(), "Se termino el tiempo, ¡Perdedor! \n Resultado: " + resp.toUpperCase(), "Perdiste", JOptionPane.INFORMATION_MESSAGE);
+                    frame.initButtonsLetras();
+                }
+            }
+        };
         this.timer.scheduleAtFixedRate(timerTask, 0, 1);
     }
 

@@ -9,6 +9,7 @@ import controlador.GeneraPalabra;
 import controlador.NumerosJuego;
 import controlador.Tiempo;
 import java.awt.Color;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
 import modelo.OperadoresString;
@@ -20,11 +21,13 @@ import modelo.OperadoresString;
 public class Principal extends javax.swing.JFrame {
 
     private final NumerosJuego numeroJuego;
-    private final JToggleButton[] arrayButtons;
+    private final JToggleButton[] arrayButtonsNumeros;
+    private final JButton[] arrayButtonsLetras;
     private final CalculaRespuesta calculaRespuesta;
     private Tiempo tiempo;
     private String cadenaCalculo = "";
     private int SECUENCIA = 2;
+    private int MAXIMO;
 
     private boolean INICIO = false;
     
@@ -35,7 +38,7 @@ public class Principal extends javax.swing.JFrame {
      */
     public Principal() {
         initComponents();
-        this.arrayButtons = new JToggleButton[]{
+        this.arrayButtonsNumeros = new JToggleButton[]{
             jToggleButton1,
             jToggleButton2,
             jToggleButton3,
@@ -44,13 +47,24 @@ public class Principal extends javax.swing.JFrame {
             jToggleButton6,
             jToggleButton7
         };
+        this.arrayButtonsLetras = new JButton[]{
+            btnLetra1,
+            btnLetra2,
+            btnLetra3,
+            btnLetra4,
+            btnLetra5,
+            btnLetra6,
+            btnLetra7,
+            btnLetra8,
+            btnLetra9
+        };
         this.numeroJuego = NumerosJuego.getInstance();
         this.calculaRespuesta = new CalculaRespuesta();
     }
 
     public void initButtons() {
         numeroJuego.generateNumbers();
-        numeroJuego.setButtonsNumber(arrayButtons);
+        numeroJuego.setButtonsNumber(arrayButtonsNumeros);
         jLabelResultado.setText(numeroJuego.getRESULTADO() + "");
         reset();
         btnGenerar.setEnabled(true);
@@ -58,7 +72,18 @@ public class Principal extends javax.swing.JFrame {
         btnReiniciar.setEnabled(false);
         jTabbedPane.setEnabled(true);
         INICIO = false;
+        MAXIMO = 15;
         System.out.println(numeroJuego.mostrarResultado());
+    }
+    
+    public void initButtonsLetras() {
+        resetletras();
+        btnGenerarLetras.setEnabled(true);
+        btnIniciarLetras.setEnabled(false);
+        btnReiniciar.setEnabled(false);
+        jTabbedPane.setEnabled(true);
+        INICIO = false;
+        MAXIMO = 9;
     }
 
     private void addCadenaToggle(JToggleButton button) {
@@ -122,13 +147,38 @@ public class Principal extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Iniciar el juego", "Inicia", JOptionPane.ERROR_MESSAGE);
         }
     }
+    
+     private void addCadenaLetra(JButton button) {
+        if (INICIO) {
+            if (maxCaracteres()) {
+                String string = button.getText();
+                if (!string.isEmpty()) {
+                    if (cadenaCalculo.isEmpty()) {
+                        cadenaCalculo = string;
+                    } else {
+                        cadenaCalculo += string;
+                    }
+                    refreshCalculoPalabra();
+                } else {
+                    button.setSelected(false);
+                    JOptionPane.showMessageDialog(this, "No se han iniciado valores", "No hay valores", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                button.setSelected(true);
+                JOptionPane.showMessageDialog(this, "Haz llegado al tope de letras", "Máximo de letras", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            button.setSelected(false);
+            JOptionPane.showMessageDialog(this, "Inicia el juego", "Inicia", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
     private boolean ordenSecuencia() {
         return (SECUENCIA % 2 == 0);
     }
 
     private boolean maxCaracteres() {
-        return (SECUENCIA < 15);
+        return (SECUENCIA < MAXIMO);
     }
 
     private void refreshCalculo() {
@@ -142,6 +192,15 @@ public class Principal extends javax.swing.JFrame {
             this.tiempo.stop();
             JOptionPane.showMessageDialog(this, "¡Increíble! Has ganado, felicidades :D", "Ganador", JOptionPane.INFORMATION_MESSAGE);
             initButtons();
+        }
+    }
+    
+    private void refreshCalculoPalabra() {
+        jLabelCalculo2.setText(cadenaCalculo.trim());
+        if (cadenaCalculo.equalsIgnoreCase(this.generaPalabra.getPALABRA_FINAL())) {
+            this.tiempo.stop();
+            JOptionPane.showMessageDialog(this, "¡Increíble! Has ganado, felicidades :D", "Ganador", JOptionPane.INFORMATION_MESSAGE);
+            initButtonsLetras();
         }
     }
 
@@ -160,9 +219,18 @@ public class Principal extends javax.swing.JFrame {
         jLabelCuenta.setForeground(Color.RED);
         jLabelEstado.setForeground(Color.RED);
         jLabelResultado.setForeground(Color.RED);
-        for (JToggleButton button : arrayButtons) {
+        for (JToggleButton button : arrayButtonsNumeros) {
             button.setSelected(false);
         }
+    }
+    
+    private void resetletras() {
+        cadenaCalculo = "";
+
+        jProgressBar2.setValue(0);
+        jProgressBar2.setString("00:00");
+
+        jLabelCalculo2.setText("");
     }
 
     /**
@@ -202,15 +270,15 @@ public class Principal extends javax.swing.JFrame {
         jProgressBar2 = new javax.swing.JProgressBar();
         jPanelCalculo2 = new javax.swing.JPanel();
         jLabelCalculo2 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
-        jButton7 = new javax.swing.JButton();
-        jButton8 = new javax.swing.JButton();
-        jButton9 = new javax.swing.JButton();
+        btnLetra2 = new javax.swing.JButton();
+        btnLetra1 = new javax.swing.JButton();
+        btnLetra3 = new javax.swing.JButton();
+        btnLetra4 = new javax.swing.JButton();
+        btnLetra5 = new javax.swing.JButton();
+        btnLetra6 = new javax.swing.JButton();
+        btnLetra7 = new javax.swing.JButton();
+        btnLetra8 = new javax.swing.JButton();
+        btnLetra9 = new javax.swing.JButton();
         jLabelStatusPalabra = new javax.swing.JLabel();
         jSeparator2 = new javax.swing.JSeparator();
         btnGenerarLetras = new javax.swing.JButton();
@@ -218,7 +286,7 @@ public class Principal extends javax.swing.JFrame {
         jSeparator3 = new javax.swing.JSeparator();
         btnIniciarLetras = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextPane1 = new javax.swing.JTextPane();
+        jTextPane = new javax.swing.JTextPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -465,14 +533,14 @@ public class Principal extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanelCalculo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jToggleButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jToggleButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jToggleButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jToggleButton2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jToggleButton3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jToggleButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jToggleButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jToggleButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jToggleButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jToggleButton7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jToggleButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonSuma)
@@ -520,42 +588,87 @@ public class Principal extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jButton1.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        jButton1.setText("B");
-        jButton1.setPreferredSize(new java.awt.Dimension(50, 23));
+        btnLetra2.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btnLetra2.setText("B");
+        btnLetra2.setPreferredSize(new java.awt.Dimension(50, 23));
+        btnLetra2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLetra2ActionPerformed(evt);
+            }
+        });
 
-        jButton2.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        jButton2.setText("A");
-        jButton2.setPreferredSize(new java.awt.Dimension(50, 23));
+        btnLetra1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btnLetra1.setText("A");
+        btnLetra1.setPreferredSize(new java.awt.Dimension(50, 23));
+        btnLetra1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLetra1ActionPerformed(evt);
+            }
+        });
 
-        jButton3.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        jButton3.setText("C");
-        jButton3.setPreferredSize(new java.awt.Dimension(50, 23));
+        btnLetra3.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btnLetra3.setText("C");
+        btnLetra3.setPreferredSize(new java.awt.Dimension(50, 23));
+        btnLetra3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLetra3ActionPerformed(evt);
+            }
+        });
 
-        jButton4.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        jButton4.setText("D");
-        jButton4.setToolTipText("");
-        jButton4.setPreferredSize(new java.awt.Dimension(50, 23));
+        btnLetra4.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btnLetra4.setText("D");
+        btnLetra4.setToolTipText("");
+        btnLetra4.setPreferredSize(new java.awt.Dimension(50, 23));
+        btnLetra4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLetra4ActionPerformed(evt);
+            }
+        });
 
-        jButton5.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        jButton5.setText("E");
-        jButton5.setPreferredSize(new java.awt.Dimension(50, 23));
+        btnLetra5.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btnLetra5.setText("E");
+        btnLetra5.setPreferredSize(new java.awt.Dimension(50, 23));
+        btnLetra5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLetra5ActionPerformed(evt);
+            }
+        });
 
-        jButton6.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        jButton6.setText("F");
-        jButton6.setPreferredSize(new java.awt.Dimension(50, 23));
+        btnLetra6.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btnLetra6.setText("F");
+        btnLetra6.setPreferredSize(new java.awt.Dimension(50, 23));
+        btnLetra6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLetra6ActionPerformed(evt);
+            }
+        });
 
-        jButton7.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        jButton7.setText("G");
-        jButton7.setPreferredSize(new java.awt.Dimension(50, 23));
+        btnLetra7.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btnLetra7.setText("G");
+        btnLetra7.setPreferredSize(new java.awt.Dimension(50, 23));
+        btnLetra7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLetra7ActionPerformed(evt);
+            }
+        });
 
-        jButton8.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        jButton8.setText("H");
-        jButton8.setPreferredSize(new java.awt.Dimension(50, 23));
+        btnLetra8.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btnLetra8.setText("H");
+        btnLetra8.setPreferredSize(new java.awt.Dimension(50, 23));
+        btnLetra8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLetra8ActionPerformed(evt);
+            }
+        });
 
-        jButton9.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        jButton9.setText("I");
-        jButton9.setPreferredSize(new java.awt.Dimension(50, 23));
+        btnLetra9.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btnLetra9.setText("I");
+        btnLetra9.setPreferredSize(new java.awt.Dimension(50, 23));
+        btnLetra9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLetra9ActionPerformed(evt);
+            }
+        });
 
         jLabelStatusPalabra.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabelStatusPalabra.setForeground(new java.awt.Color(204, 0, 0));
@@ -571,12 +684,22 @@ public class Principal extends javax.swing.JFrame {
 
         btnReiniciarLetras.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         btnReiniciarLetras.setText("Reiniciar");
+        btnReiniciarLetras.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReiniciarLetrasActionPerformed(evt);
+            }
+        });
 
         btnIniciarLetras.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         btnIniciarLetras.setText("INICIAR");
         btnIniciarLetras.setEnabled(false);
+        btnIniciarLetras.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnIniciarLetrasActionPerformed(evt);
+            }
+        });
 
-        jScrollPane1.setViewportView(jTextPane1);
+        jScrollPane1.setViewportView(jTextPane);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -596,23 +719,23 @@ public class Principal extends javax.swing.JFrame {
                                 .addComponent(jLabelStatusPalabra, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGap(4, 4, 4)
-                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnLetra1, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnLetra2, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnLetra3, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnLetra4, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnLetra5, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(btnLetra6, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnLetra7, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnLetra8, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnLetra9, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(btnGenerarLetras, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -622,7 +745,7 @@ public class Principal extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButton1, jButton2, jButton3, jButton4, jButton5, jButton6, jButton7, jButton8});
+        jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnLetra1, btnLetra2, btnLetra3, btnLetra4, btnLetra5, btnLetra6, btnLetra7, btnLetra8});
 
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -633,15 +756,15 @@ public class Principal extends javax.swing.JFrame {
                 .addComponent(jPanelCalculo2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnLetra1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnLetra5, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnLetra4, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnLetra3, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnLetra2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnLetra6, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnLetra9, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnLetra8, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnLetra7, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jLabelStatusPalabra, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -751,7 +874,7 @@ public class Principal extends javax.swing.JFrame {
         jTabbedPane.setEnabled(false);
         this.tiempo = new Tiempo();
         this.tiempo.setElements(jProgressBar, this);
-        this.tiempo.start();
+        this.tiempo.startNumeros();
     }//GEN-LAST:event_btnIniciarActionPerformed
 
     private void btnReiniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReiniciarActionPerformed
@@ -762,8 +885,71 @@ public class Principal extends javax.swing.JFrame {
     private void btnGenerarLetrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarLetrasActionPerformed
         // TODO add your handling code here:
         generaPalabra = new GeneraPalabra();
-        generaPalabra.iniciar(jLabelStatusPalabra);
+        generaPalabra.iniciar(jLabelStatusPalabra, arrayButtonsLetras, jTextPane);
+        btnIniciarLetras.setEnabled(true);
     }//GEN-LAST:event_btnGenerarLetrasActionPerformed
+
+    private void btnIniciarLetrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarLetrasActionPerformed
+        // TODO add your handling code here:
+        INICIO = true;
+        MAXIMO = 9;
+        btnReiniciarLetras.setEnabled(true);
+        btnGenerarLetras.setEnabled(false);
+        btnIniciarLetras.setEnabled(false);
+        this.tiempo = new Tiempo();
+        this.tiempo.setElements(jProgressBar2, this);
+        this.tiempo.startLetras(generaPalabra.getPALABRA_FINAL());
+    }//GEN-LAST:event_btnIniciarLetrasActionPerformed
+
+    private void btnLetra1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLetra1ActionPerformed
+        // TODO add your handling code here:
+        addCadenaLetra(btnLetra1);
+    }//GEN-LAST:event_btnLetra1ActionPerformed
+
+    private void btnLetra2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLetra2ActionPerformed
+        // TODO add your handling code here:
+        addCadenaLetra(btnLetra2);
+    }//GEN-LAST:event_btnLetra2ActionPerformed
+
+    private void btnLetra3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLetra3ActionPerformed
+        // TODO add your handling code here:
+        addCadenaLetra(btnLetra3);
+    }//GEN-LAST:event_btnLetra3ActionPerformed
+
+    private void btnLetra4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLetra4ActionPerformed
+        // TODO add your handling code here:
+        addCadenaLetra(btnLetra4);
+    }//GEN-LAST:event_btnLetra4ActionPerformed
+
+    private void btnLetra5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLetra5ActionPerformed
+        // TODO add your handling code here:
+        addCadenaLetra(btnLetra5);
+    }//GEN-LAST:event_btnLetra5ActionPerformed
+
+    private void btnLetra6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLetra6ActionPerformed
+        // TODO add your handling code here:
+        addCadenaLetra(btnLetra6);
+    }//GEN-LAST:event_btnLetra6ActionPerformed
+
+    private void btnLetra7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLetra7ActionPerformed
+        // TODO add your handling code here:
+        addCadenaLetra(btnLetra7);
+    }//GEN-LAST:event_btnLetra7ActionPerformed
+
+    private void btnLetra8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLetra8ActionPerformed
+        // TODO add your handling code here:
+        addCadenaLetra(btnLetra8);
+    }//GEN-LAST:event_btnLetra8ActionPerformed
+
+    private void btnLetra9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLetra9ActionPerformed
+        // TODO add your handling code here:
+        addCadenaLetra(btnLetra9);
+    }//GEN-LAST:event_btnLetra9ActionPerformed
+
+    private void btnReiniciarLetrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReiniciarLetrasActionPerformed
+        // TODO add your handling code here:
+        resetletras();
+    }//GEN-LAST:event_btnReiniciarLetrasActionPerformed
 
     /**
      * @param args the command line arguments
@@ -796,23 +982,22 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JButton btnGenerarLetras;
     private javax.swing.JButton btnIniciar;
     private javax.swing.JButton btnIniciarLetras;
+    private javax.swing.JButton btnLetra1;
+    private javax.swing.JButton btnLetra2;
+    private javax.swing.JButton btnLetra3;
+    private javax.swing.JButton btnLetra4;
+    private javax.swing.JButton btnLetra5;
+    private javax.swing.JButton btnLetra6;
+    private javax.swing.JButton btnLetra7;
+    private javax.swing.JButton btnLetra8;
+    private javax.swing.JButton btnLetra9;
     private javax.swing.JButton btnReiniciar;
     private javax.swing.JButton btnReiniciarLetras;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton7;
-    private javax.swing.JButton jButton8;
-    private javax.swing.JButton jButton9;
     private javax.swing.JButton jButtonCociente;
     private javax.swing.JButton jButtonProducto;
     private javax.swing.JButton jButtonResta;
     private javax.swing.JButton jButtonSuma;
     private javax.swing.JLabel jLabelCalculo;
-    private javax.swing.JLabel jLabelCalculo1;
     private javax.swing.JLabel jLabelCalculo2;
     private javax.swing.JLabel jLabelCuenta;
     private javax.swing.JLabel jLabelEstado;
@@ -821,7 +1006,6 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanelCalculo;
-    private javax.swing.JPanel jPanelCalculo1;
     private javax.swing.JPanel jPanelCalculo2;
     private javax.swing.JPanel jPanelResultado;
     private javax.swing.JProgressBar jProgressBar;
@@ -831,7 +1015,7 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JTabbedPane jTabbedPane;
-    private javax.swing.JTextPane jTextPane1;
+    private javax.swing.JTextPane jTextPane;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JToggleButton jToggleButton2;
     private javax.swing.JToggleButton jToggleButton3;
